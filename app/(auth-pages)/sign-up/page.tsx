@@ -84,6 +84,9 @@ export default async function SignUpPage({
                   type="password"
                   placeholder="••••••••"
                   required
+                  minLength={8}
+                  pattern="^[A-Za-z0-9]{8,}$"
+                  title="Must contain only letters and numbers, minimum 8 characters"
                 />
               </div>
 
