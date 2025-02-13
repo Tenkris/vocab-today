@@ -56,12 +56,12 @@ export function Header() {
 
           {/* Desktop Auth Buttons & Theme */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login">
+            <Link href="/sign-in">
               <Button variant="ghost" size="sm">
                 Sign In
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/sign-up">
               <Button size="sm">Sign Up</Button>
             </Link>
             <Button
@@ -115,14 +115,14 @@ export function Header() {
                   ))}
                   <div className="h-px bg-border my-4" />
                   <Link
-                    href="/login"
+                    href="/sign-in"
                     onClick={() => setIsOpen(false)}
                     className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                   >
                     Sign In
                   </Link>
                   <Link
-                    href="/register"
+                    href="/sign-up"
                     onClick={() => setIsOpen(false)}
                     className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                   >
