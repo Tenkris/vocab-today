@@ -8,7 +8,7 @@ import { Search } from "lucide-react";
 // ... existing MOCK_DATA ...
 
 // Mock data
-const MOCK_DATA = {
+const MOCK_DATA: Record<string, VocabEntry[]> = {
   "2024-02-14": [
     {
       id: "1",
@@ -112,11 +112,13 @@ interface VocabEntry {
 
 export function HistoryView() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [vocabularyData, setVocabularyData] =
+    useState<Record<string, VocabEntry[]>>(MOCK_DATA);
 
-  // Convert MOCK_DATA into a flat array of entries
-  const allEntries = Object.entries(
-    MOCK_DATA as Record<string, VocabEntry[]>
-  ).flatMap(([date, entries]) => entries);
+  // Convert vocabularyData into a flat array of entries
+  const allEntries = Object.entries(vocabularyData).flatMap(
+    ([date, entries]) => entries
+  );
 
   // Filter entries based on search query
   const filteredEntries = allEntries.filter((entry) => {
@@ -142,8 +144,19 @@ export function HistoryView() {
   );
 
   const handleDelete = (id: string) => {
-    // Implement delete functionality
-    console.log("Delete:", id);
+    setVocabularyData((prevData) => {
+      const newData = { ...prevData };
+      // Loop through each date
+      for (const date in newData) {
+        // Filter out the entry with the matching id
+        newData[date] = newData[date].filter((entry) => entry.id !== id);
+        // Remove the date key if there are no entries left
+        if (newData[date].length === 0) {
+          delete newData[date];
+        }
+      }
+      return newData;
+    });
   };
 
   const handleEdit = (id: string) => {

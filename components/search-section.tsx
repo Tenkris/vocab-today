@@ -6,42 +6,73 @@ import { Button } from "./ui/button";
 import { Search } from "lucide-react";
 import { VocabularyCard } from "./vocabulary-card";
 
-// Mock search result
-const MOCK_SEARCH_RESULT = {
-  word: "serendipity",
-  phonetic: "/ˌserənˈdɪpɪti/",
-  definition: "The occurrence of finding pleasant things by chance",
-  translation: "เหตุบังเอิญที่ดี",
-  forms: {
-    noun: "serendipity",
-    adjective: "serendipitous",
-    adverb: "serendipitously",
-  },
-  examples: [
-    "Meeting my best friend was pure serendipity",
-    "The serendipity of scientific discoveries",
-    "By serendipity, she found her dream job while on vacation",
-  ],
-  synonyms: ["chance", "fortune", "luck", "destiny", "fate"],
-  antonyms: ["misfortune", "design", "plan", "intention"],
-  collocations: ["pure serendipity", "happy serendipity", "serendipity effect"],
-};
+interface VocabData {
+  word: string;
+  phonetic: string;
+  definition: string;
+  translation: string;
+  forms: Record<string, string>;
+  examples: string[];
+  synonyms: string[];
+  antonyms: string[];
+  collocations: string[];
+}
+
+// // Mock search result
+// const MOCK_SEARCH_RESULT = {
+//   word: "serendipity",
+//   phonetic: "/ˌserənˈdɪpɪti/",
+//   definition: "The occurrence of finding pleasant things by chance",
+//   translation: "เหตุบังเอิญที่ดี",
+//   forms: {
+//     noun: "serendipity",
+//     adjective: "serendipitous",
+//     adverb: "serendipitously",
+//   },
+//   examples: [
+//     "Meeting my best friend was pure serendipity",
+//     "The serendipity of scientific discoveries",
+//     "By serendipity, she found her dream job while on vacation",
+//   ],
+//   synonyms: ["chance", "fortune", "luck", "destiny", "fate"],
+//   antonyms: ["misfortune", "design", "plan", "intention"],
+//   collocations: ["pure serendipity", "happy serendipity", "serendipity effect"],
+// };
 
 export function SearchSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<VocabData | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
 
     setIsSearching(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSearching(false);
+    try {
+      const response = await fetch("/api/vocabulary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ word: searchTerm.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        console.log("Search failed:");
+        return;
+      }
+
+      setSearchResults(data.data);
       setShowResults(true);
-    }, 1000);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSave = () => {
@@ -71,9 +102,9 @@ export function SearchSection() {
         </div>
       )}
 
-      {showResults && !isSearching && searchTerm && (
+      {showResults && !isSearching && searchResults && (
         <div className="mt-8">
-          <VocabularyCard {...MOCK_SEARCH_RESULT} onSave={handleSave} />
+          <VocabularyCard {...searchResults} onSave={handleSave} />
         </div>
       )}
     </div>

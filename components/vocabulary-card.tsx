@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from './ui/card';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from './ui/button';
-import { Trash2, Edit2, BookmarkPlus, Check } from 'lucide-react';
+} from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "./ui/button";
+import { Trash2, Edit2, BookmarkPlus, Check } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,8 +22,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { cn } from '@/lib/utils';
+} from "./ui/alert-dialog";
+import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface VocabularyCardProps {
@@ -39,7 +39,7 @@ interface VocabularyCardProps {
   antonyms: string[];
   collocations: string[];
   timestamp?: number;
-  status?: 'new' | 'learning' | 'mastered';
+  status?: "new" | "learning" | "mastered";
   isSaved?: boolean;
   onSave?: () => void;
   onDelete?: () => void;
@@ -47,9 +47,9 @@ interface VocabularyCardProps {
 }
 
 const STATUS_COLORS = {
-  new: 'default',
-  learning: 'secondary',
-  mastered: 'outline',
+  new: "default",
+  learning: "secondary",
+  mastered: "outline",
 } as const;
 
 export function VocabularyCard({
@@ -67,91 +67,92 @@ export function VocabularyCard({
   isSaved,
   onSave,
   onDelete,
-  onEdit
+  onEdit,
 }: VocabularyCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-baseline gap-4">
-              <CardTitle className="text-2xl">{word}</CardTitle>
+            <div className="flex flex-col md:flex-row md:items-baseline gap-4">
+              <CardTitle className="text-xl md:text-2xl">{word}</CardTitle>
               <CardDescription>{phonetic}</CardDescription>
             </div>
-            <CardDescription className="text-lg">
+            <CardDescription className="text-base md:text-lg">
               {translation}
-              {timestamp && ` · ${format(timestamp, 'p')}`}
+              {timestamp && ` · ${format(timestamp, "p")}`}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
             {status && (
-              <Badge variant={STATUS_COLORS[status]}>
+              <Badge
+                variant={STATUS_COLORS[status]}
+                className="w-full md:w-auto"
+              >
                 {status}
               </Badge>
             )}
-            {onSave && (
-              <Button
-                onClick={onSave}
-                disabled={isSaved}
-                variant={isSaved ? "secondary" : "default"}
-                size="sm"
-                className="whitespace-nowrap"
-              >
-                {isSaved ? (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    Saved
-                  </>
-                ) : (
-                  <>
-                    <BookmarkPlus className="h-4 w-4 mr-2" />
-                    Save Word
-                  </>
-                )}
-              </Button>
-            )}
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onEdit}
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-            )}
-            {onDelete && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Word</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete "{word}"?
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <div className="flex items-center gap-2">
+              {onSave && (
+                <Button
+                  onClick={onSave}
+                  disabled={isSaved}
+                  variant={isSaved ? "secondary" : "default"}
+                  size="sm"
+                  className="w-full md:w-auto whitespace-nowrap"
+                >
+                  {isSaved ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Saved
+                    </>
+                  ) : (
+                    <>
+                      <BookmarkPlus className="h-4 w-4 mr-2" />
+                      Save Word
+                    </>
+                  )}
+                </Button>
+              )}
+              {onEdit && (
+                <Button variant="ghost" size="icon" onClick={onEdit}>
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              )}
+              {onDelete && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Word</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{word}"? This action
+                        cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onDelete}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-lg mb-4">{definition}</p>
-        
+        <p className="text-base md:text-lg mb-4">{definition}</p>
+
         <Tabs defaultValue="forms" className="w-full">
           <ScrollArea className="w-full whitespace-nowrap rounded-md">
             <TabsList className="inline-flex w-full md:w-auto h-9 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground">
@@ -162,12 +163,12 @@ export function VocabularyCard({
             </TabsList>
             <ScrollBar orientation="horizontal" className="invisible" />
           </ScrollArea>
-          
+
           <TabsContent value="forms" className="mt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(forms).map(([type, word]) => (
                 <div key={type} className="flex items-center gap-2">
-                  <Badge variant="outline" className="w-20">
+                  <Badge variant="outline" className="w-20 shrink-0">
                     {type}
                   </Badge>
                   <span>{word}</span>
@@ -191,9 +192,13 @@ export function VocabularyCard({
               <div>
                 <h4 className="font-semibold mb-2">Synonyms:</h4>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md">
-                  <div className="flex gap-2 pb-4">
+                  <div className="flex flex-wrap gap-2 pb-4">
                     {synonyms.map((synonym) => (
-                      <Badge key={synonym} variant="secondary" className="shrink-0">
+                      <Badge
+                        key={synonym}
+                        variant="secondary"
+                        className="shrink-0"
+                      >
                         {synonym}
                       </Badge>
                     ))}
@@ -204,9 +209,13 @@ export function VocabularyCard({
               <div>
                 <h4 className="font-semibold mb-2">Antonyms:</h4>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md">
-                  <div className="flex gap-2 pb-4">
+                  <div className="flex flex-wrap gap-2 pb-4">
                     {antonyms.map((antonym) => (
-                      <Badge key={antonym} variant="outline" className="shrink-0">
+                      <Badge
+                        key={antonym}
+                        variant="outline"
+                        className="shrink-0"
+                      >
                         {antonym}
                       </Badge>
                     ))}
@@ -219,9 +228,13 @@ export function VocabularyCard({
 
           <TabsContent value="collocations" className="mt-4">
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
-              <div className="flex gap-2 pb-4">
+              <div className="flex flex-wrap gap-2 pb-4">
                 {collocations.map((collocation) => (
-                  <Badge key={collocation} variant="secondary" className="shrink-0">
+                  <Badge
+                    key={collocation}
+                    variant="secondary"
+                    className="shrink-0"
+                  >
                     {collocation}
                   </Badge>
                 ))}
