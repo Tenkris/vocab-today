@@ -58,7 +58,6 @@ export function SearchSection() {
     setIsSaved(false);
 
     try {
-      // First check if word exists in database
       const supabase = createClient();
       const { data: existingWord } = await supabase
         .from("vocabulary")
@@ -73,7 +72,6 @@ export function SearchSection() {
         return;
       }
 
-      // If word doesn't exist, search via API
       const response = await fetch("/api/vocabulary", {
         method: "POST",
         headers: {
@@ -105,6 +103,15 @@ export function SearchSection() {
 
     const supabase = createClient();
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setSaveError("User not authenticated");
+        return;
+      }
+
       const { error } = await supabase.from("vocabulary").insert([
         {
           word: searchResults.word,
@@ -118,6 +125,7 @@ export function SearchSection() {
           collocations: searchResults.collocations,
           timestamp: new Date().toISOString(),
           status: "new",
+          user_id: user.id,
         },
       ]);
 
@@ -132,7 +140,6 @@ export function SearchSection() {
 
       setIsSaved(true);
 
-      // Reset form after successful save
       setTimeout(() => {
         setSearchTerm("");
         setSearchResults(null);
