@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MoonIcon, SunIcon, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
@@ -10,11 +10,32 @@ import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { createClient } from "@/utils/supabase/client";
 
 export function Header() {
   const { setTheme, theme } = useTheme();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // Check current user
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+  };
 
   const routes = [
     {
@@ -56,14 +77,22 @@ export function Header() {
 
           {/* Desktop Auth Buttons & Theme */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/sign-in">
-              <Button variant="ghost" size="sm">
-                Sign In
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                Sign Out
               </Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button size="sm">Sign Up</Button>
-            </Link>
+            ) : (
+              <>
+                <Link href="/sign-in">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button size="sm">Sign Up</Button>
+                </Link>
+              </>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -114,20 +143,35 @@ export function Header() {
                     </Link>
                   ))}
                   <div className="h-px bg-border my-4" />
-                  <Link
-                    href="/sign-in"
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    Sign Up
-                  </Link>
+                  {user ? (
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        handleSignOut();
+                        setIsOpen(false);
+                      }}
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      Sign Out
+                    </Button>
+                  ) : (
+                    <>
+                      <Link
+                        href="/sign-in"
+                        onClick={() => setIsOpen(false)}
+                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/sign-up"
+                        onClick={() => setIsOpen(false)}
+                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>
