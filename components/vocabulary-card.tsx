@@ -41,7 +41,9 @@ interface VocabularyCardProps {
   timestamp?: number;
   status?: "new" | "learning" | "mastered";
   isSaved?: boolean;
-  onSave?: () => void;
+  isSaving?: boolean;
+  saveError?: string | null;
+  onSave?: () => Promise<void>;
   onDelete?: () => void;
   onEdit?: () => void;
 }
@@ -64,7 +66,9 @@ export function VocabularyCard({
   collocations,
   timestamp,
   status,
-  isSaved,
+  isSaved = false,
+  isSaving = false,
+  saveError = null,
   onSave,
   onDelete,
   onEdit,
@@ -93,18 +97,18 @@ export function VocabularyCard({
               </Badge>
             )}
             <div className="flex items-center gap-2">
-              {onSave && (
+              {onSave && !isSaved && (
                 <Button
                   onClick={onSave}
-                  disabled={isSaved}
-                  variant={isSaved ? "secondary" : "default"}
+                  disabled={isSaving || isSaved}
+                  variant="default"
                   size="sm"
                   className="w-full md:w-auto whitespace-nowrap"
                 >
-                  {isSaved ? (
+                  {isSaving ? (
                     <>
-                      <Check className="h-4 w-4 mr-2" />
-                      Saved
+                      <div className="animate-spin mr-2">⏳</div>
+                      Saving...
                     </>
                   ) : (
                     <>
@@ -113,6 +117,12 @@ export function VocabularyCard({
                     </>
                   )}
                 </Button>
+              )}
+              {isSaved && (
+                <Badge variant="secondary" className="w-full md:w-auto">
+                  <Check className="h-4 w-4 mr-2" />
+                  Already Saved
+                </Badge>
               )}
               {onEdit && (
                 <Button variant="ghost" size="icon" onClick={onEdit}>
@@ -149,6 +159,9 @@ export function VocabularyCard({
             </div>
           </div>
         </div>
+        {saveError && (
+          <p className="text-sm text-destructive mt-2">{saveError}</p>
+        )}
       </CardHeader>
       <CardContent>
         <p className="text-base md:text-lg mb-4">{definition}</p>

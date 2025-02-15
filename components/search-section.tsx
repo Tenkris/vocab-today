@@ -43,6 +43,9 @@ interface VocabData {
 export function SearchSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState<VocabData | null>(null);
 
@@ -51,7 +54,26 @@ export function SearchSection() {
     if (!searchTerm.trim()) return;
 
     setIsSearching(true);
+    setSaveError(null);
+    setIsSaved(false);
+
     try {
+      // First check if word exists in database
+      const supabase = createClient();
+      const { data: existingWord } = await supabase
+        .from("vocabulary")
+        .select("*")
+        .eq("word", searchTerm.trim())
+        .single();
+
+      if (existingWord) {
+        setSearchResults(existingWord);
+        setShowResults(true);
+        setIsSaved(true);
+        return;
+      }
+
+      // If word doesn't exist, search via API
       const response = await fetch("/api/vocabulary", {
         method: "POST",
         headers: {
@@ -63,7 +85,6 @@ export function SearchSection() {
       const data = await response.json();
 
       if (!data.success) {
-        console.log("Search failed:");
         return;
       }
 
@@ -78,6 +99,9 @@ export function SearchSection() {
 
   const handleSave = async () => {
     if (!searchResults) return;
+
+    setIsSaving(true);
+    setSaveError(null);
 
     const supabase = createClient();
     try {
@@ -97,10 +121,28 @@ export function SearchSection() {
         },
       ]);
 
-      if (error) throw error;
-      console.log("Word saved successfully");
+      if (error) {
+        if (error.code === "23505") {
+          setSaveError("This word is already in your vocabulary");
+          setIsSaved(true);
+          return;
+        }
+        throw error;
+      }
+
+      setIsSaved(true);
+
+      // Reset form after successful save
+      setTimeout(() => {
+        setSearchTerm("");
+        setSearchResults(null);
+        setShowResults(false);
+      }, 1500);
     } catch (error) {
       console.error("Error saving word:", error);
+      setSaveError("Failed to save word. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -113,22 +155,29 @@ export function SearchSection() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1"
+          disabled={isSearching || isSaving}
         />
-        <Button type="submit" disabled={isSearching}>
+        <Button type="submit" disabled={isSearching || isSaving}>
           <Search className="h-4 w-4 mr-2" />
-          Search
+          {isSearching ? "Searching..." : "Search"}
         </Button>
       </form>
 
       {isSearching && (
         <div className="mt-8 text-center text-muted-foreground">
-          Searching...
+          <div className="animate-pulse">Searching...</div>
         </div>
       )}
 
       {showResults && !isSearching && searchResults && (
         <div className="mt-8">
-          <VocabularyCard {...searchResults} onSave={handleSave} />
+          <VocabularyCard
+            {...searchResults}
+            onSave={handleSave}
+            isSaving={isSaving}
+            isSaved={isSaved}
+            saveError={saveError}
+          />
         </div>
       )}
     </div>
