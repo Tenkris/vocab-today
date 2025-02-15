@@ -76,86 +76,104 @@ export function VocabularyCard({
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex flex-col md:flex-row md:items-baseline gap-4">
-              <CardTitle className="text-xl md:text-2xl">{word}</CardTitle>
-              <CardDescription>{phonetic}</CardDescription>
+        <div className="flex flex-col space-y-4">
+          {/* Word Title and Actions Row */}
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="space-y-1 flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-baseline gap-2">
+                <CardTitle className="text-xl sm:text-2xl">{word}</CardTitle>
+                <CardDescription>{phonetic}</CardDescription>
+              </div>
+              <CardDescription className="text-base">
+                {translation}
+                {timestamp && ` · ${format(timestamp, "p")}`}
+              </CardDescription>
             </div>
-            <CardDescription className="text-base md:text-lg">
-              {translation}
-              {timestamp && ` · ${format(timestamp, "p")}`}
-            </CardDescription>
-          </div>
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
-            {status && (
-              <Badge
-                variant={STATUS_COLORS[status]}
-                className="w-full md:w-auto"
-              >
-                {status}
-              </Badge>
-            )}
-            <div className="flex items-center gap-2">
-              {onSave && !isSaved && (
-                <Button
-                  onClick={onSave}
-                  disabled={isSaving || isSaved}
-                  variant="default"
-                  size="sm"
-                  className="w-full md:w-auto whitespace-nowrap"
+
+            {/* Actions Buttons */}
+            <div className="flex flex-row sm:flex-col lg:flex-row items-center gap-2">
+              {status && (
+                <Badge
+                  variant={STATUS_COLORS[status]}
+                  className="w-auto text-xs sm:text-sm"
                 >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin mr-2">⏳</div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <BookmarkPlus className="h-4 w-4 mr-2" />
-                      Save Word
-                    </>
-                  )}
-                </Button>
-              )}
-              {isSaved && (
-                <Badge variant="secondary" className="w-full md:w-auto">
-                  <Check className="h-4 w-4 mr-2" />
-                  Already Saved
+                  {status}
                 </Badge>
               )}
-              {onEdit && (
-                <Button variant="ghost" size="icon" onClick={onEdit}>
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              )}
-              {onDelete && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4" />
+              <div className="flex items-center gap-2">
+                {onSave && !isSaved && (
+                  <Button
+                    onClick={onSave}
+                    disabled={isSaving || isSaved}
+                    variant="default"
+                    size="sm"
+                    className="whitespace-nowrap text-xs sm:text-sm"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin mr-2">⏳</div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="h-4 w-4 mr-2" />
+                        Save Word
+                      </>
+                    )}
+                  </Button>
+                )}
+                {isSaved && (
+                  <Badge variant="secondary" className="whitespace-nowrap">
+                    <Check className="h-4 w-4 mr-2" />
+                    Saved
+                  </Badge>
+                )}
+                <div className="flex items-center gap-1">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={onEdit}
+                    >
+                      <Edit2 className="h-4 w-4" />
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Word</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{word}"? This action
-                        cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={onDelete}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
+                  )}
+                  {onDelete && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="sm:max-w-[425px]">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Word</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{word}"? This
+                            action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="sm:space-x-2">
+                          <AlertDialogCancel className="mb-2 sm:mb-0">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={onDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -163,18 +181,19 @@ export function VocabularyCard({
           <p className="text-sm text-destructive mt-2">{saveError}</p>
         )}
       </CardHeader>
+
       <CardContent>
-        <p className="text-base md:text-lg mb-4">{definition}</p>
+        <p className="text-base mb-4">{definition}</p>
 
         <Tabs defaultValue="forms" className="w-full">
           <ScrollArea className="w-full whitespace-nowrap rounded-md">
-            <TabsList className="inline-flex w-full md:w-auto h-9 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground">
+            <TabsList className="inline-flex h-9 items-center text-xs sm:text-sm">
               <TabsTrigger value="forms">Word Forms</TabsTrigger>
               <TabsTrigger value="examples">Examples</TabsTrigger>
               <TabsTrigger value="synonyms">Synonyms</TabsTrigger>
               <TabsTrigger value="collocations">Collocations</TabsTrigger>
             </TabsList>
-            <ScrollBar orientation="horizontal" className="invisible" />
+            <ScrollBar orientation="horizontal" />
           </ScrollArea>
 
           <TabsContent value="forms" className="mt-4">
@@ -184,7 +203,7 @@ export function VocabularyCard({
                   <Badge variant="outline" className="w-20 shrink-0">
                     {type}
                   </Badge>
-                  <span>{word}</span>
+                  <span className="text-sm sm:text-base">{word}</span>
                 </div>
               ))}
             </div>

@@ -215,8 +215,8 @@ export function HistoryView() {
   );
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="relative">
+    <div>
+      <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search words, definitions, or translations..."
@@ -235,7 +235,7 @@ export function HistoryView() {
           No words saved yet. Start by searching and saving some words!
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="">
           {Object.entries(groupedEntries).map(([date, entries]) => (
             <div key={date} className="space-y-4">
               <h2 className="text-lg font-semibold sticky top-0 bg-background py-2">
