@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { VocabularyCard } from "./vocabulary-card";
 import { Input } from "./ui/input";
 import { Search } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 // ... existing MOCK_DATA ...
 
@@ -34,6 +35,7 @@ const MOCK_DATA: VocabEntry[] = [
       "ephemeral existence",
       "ephemeral moment",
     ],
+    user_id: "user1",
   },
   {
     id: "2",
@@ -60,6 +62,7 @@ const MOCK_DATA: VocabEntry[] = [
       "happy serendipity",
       "serendipity effect",
     ],
+    user_id: "user1",
   },
   {
     id: "3",
@@ -86,6 +89,7 @@ const MOCK_DATA: VocabEntry[] = [
       "ubiquitous feature",
       "become ubiquitous",
     ],
+    user_id: "user1",
   },
 ];
 
@@ -104,11 +108,88 @@ interface VocabEntry {
   synonyms: string[];
   antonyms: string[];
   collocations: string[];
+  user_id: string;
 }
 
 export function HistoryView() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [vocabularyData, setVocabularyData] = useState<VocabEntry[]>(MOCK_DATA);
+  const [vocabularyData, setVocabularyData] = useState<VocabEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchVocabulary();
+  }, []);
+
+  const fetchVocabulary = async () => {
+    setIsLoading(true);
+    const supabase = createClient();
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.log("User not authenticated:", userError);
+        return;
+      }
+
+      // Fetch vocabulary data for current user
+      const { data, error } = await supabase
+        .from("vocabulary")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("timestamp", { ascending: false });
+
+      if (error) throw error;
+
+      setVocabularyData(data || []);
+    } catch (error) {
+      console.log("Failed to load vocabulary");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.from("vocabulary").delete().eq("id", id);
+
+      if (error) throw error;
+
+      setVocabularyData((prevData) =>
+        prevData.filter((entry) => entry.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting word:", error);
+    }
+  };
+
+  const handleStatusUpdate = async (
+    id: string,
+    newStatus: "new" | "learning" | "mastered"
+  ) => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase
+        .from("vocabulary")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setVocabularyData((prevData) =>
+        prevData.map((entry) =>
+          entry.id === id ? { ...entry, status: newStatus } : entry
+        )
+      );
+    } catch (error) {
+      console.log("Error updating status:", error);
+    }
+  };
 
   // Filter entries based on search query
   const filteredEntries = vocabularyData.filter((entry) => {
@@ -133,17 +214,6 @@ export function HistoryView() {
     {} as Record<string, VocabEntry[]>
   );
 
-  const handleDelete = (id: string) => {
-    setVocabularyData((prevData) =>
-      prevData.filter((entry) => entry.id !== id)
-    );
-  };
-
-  const handleEdit = (id: string) => {
-    // Implement edit functionality
-    console.log("Edit:", id);
-  };
-
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="relative">
@@ -156,30 +226,39 @@ export function HistoryView() {
         />
       </div>
 
-      <div className="space-y-8">
-        {Object.entries(groupedEntries).map(([date, entries]) => (
-          <div key={date} className="space-y-4">
-            <h2 className="text-lg font-semibold sticky top-0 bg-background py-2">
-              {new Date(date).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </h2>
-            <div className="space-y-4">
-              {entries.map((entry) => (
-                <VocabularyCard
-                  key={entry.id}
-                  {...entry}
-                  onDelete={() => handleDelete(entry.id)}
-                  onEdit={() => handleEdit(entry.id)}
-                />
-              ))}
+      {isLoading ? (
+        <div className="text-center py-8">
+          <div className="animate-pulse">Loading your vocabulary...</div>
+        </div>
+      ) : vocabularyData.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          No words saved yet. Start by searching and saving some words!
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {Object.entries(groupedEntries).map(([date, entries]) => (
+            <div key={date} className="space-y-4">
+              <h2 className="text-lg font-semibold sticky top-0 bg-background py-2">
+                {new Date(date).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h2>
+              <div className="space-y-4">
+                {entries.map((entry) => (
+                  <VocabularyCard
+                    key={entry.id}
+                    {...entry}
+                    onDelete={() => handleDelete(entry.id)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
