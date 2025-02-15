@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "Vocab Today - Learn English Vocabulary",
   description:
     "Enhance your English vocabulary with comprehensive learning tools and Thai translations.",
+  icons: {
+    icon: "/img/logo.svg",
+  },
 };
 
 export default function RootLayout({

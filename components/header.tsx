@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { createClient } from "@/utils/supabase/client";
+import Image from "next/image";
 
 export function Header() {
   const { setTheme, theme } = useTheme();
@@ -53,8 +54,15 @@ export function Header() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo - always visible */}
-          <Link href="/" className="text-xl md:text-2xl font-bold">
-            Vocab Today
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/img/logo.svg"
+              alt="Vocab Today Logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
+            <span className="font-semibold">Vocab Today</span>
           </Link>
 
           {/* Desktop Navigation */}
