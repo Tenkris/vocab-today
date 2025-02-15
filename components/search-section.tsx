@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Search } from "lucide-react";
 import { VocabularyCard } from "./vocabulary-card";
+import { createClient } from "@/utils/supabase/client";
 
 interface VocabData {
   word: string;
@@ -75,9 +76,32 @@ export function SearchSection() {
     }
   };
 
-  const handleSave = () => {
-    // Implement save functionality
-    console.log("Saving word:", searchTerm);
+  const handleSave = async () => {
+    if (!searchResults) return;
+
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.from("vocabulary").insert([
+        {
+          word: searchResults.word,
+          phonetic: searchResults.phonetic,
+          definition: searchResults.definition,
+          translation: searchResults.translation,
+          forms: searchResults.forms,
+          examples: searchResults.examples,
+          synonyms: searchResults.synonyms,
+          antonyms: searchResults.antonyms,
+          collocations: searchResults.collocations,
+          timestamp: new Date().toISOString(),
+          status: "new",
+        },
+      ]);
+
+      if (error) throw error;
+      console.log("Word saved successfully");
+    } catch (error) {
+      console.error("Error saving word:", error);
+    }
   };
 
   return (

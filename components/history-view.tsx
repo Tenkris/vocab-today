@@ -8,90 +8,86 @@ import { Search } from "lucide-react";
 // ... existing MOCK_DATA ...
 
 // Mock data
-const MOCK_DATA: Record<string, VocabEntry[]> = {
-  "2024-02-14": [
-    {
-      id: "1",
-      word: "ephemeral",
-      phonetic: "/ɪˈfem(ə)rəl/",
-      definition: "Lasting for a very short time",
-      translation: "ชั่วคราว",
-      timestamp: new Date("2024-02-14T09:15:00").getTime(),
-      status: "new",
-      forms: {
-        noun: "ephemerality",
-        adjective: "ephemeral",
-        adverb: "ephemerally",
-      },
-      examples: [
-        "The ephemeral nature of social media trends",
-        "An ephemeral display of northern lights",
-        "Their fame proved to be ephemeral",
-      ],
-      synonyms: ["fleeting", "transient", "momentary", "brief", "temporary"],
-      antonyms: ["permanent", "lasting", "eternal", "enduring"],
-      collocations: [
-        "ephemeral beauty",
-        "ephemeral existence",
-        "ephemeral moment",
-      ],
+const MOCK_DATA: VocabEntry[] = [
+  {
+    id: "1",
+    word: "ephemeral",
+    phonetic: "/ɪˈfem(ə)rəl/",
+    definition: "Lasting for a very short time",
+    translation: "ชั่วคราว",
+    timestamp: new Date("2024-02-14T09:15:00").getTime(),
+    status: "new",
+    forms: {
+      noun: "ephemerality",
+      adjective: "ephemeral",
+      adverb: "ephemerally",
     },
-    {
-      id: "2",
-      word: "serendipity",
-      phonetic: "/ˌserənˈdɪpɪti/",
-      definition: "The occurrence of finding pleasant things by chance",
-      translation: "เหตุบังเอิญที่ดี",
-      timestamp: new Date("2024-02-14T11:30:00").getTime(),
-      status: "learning",
-      forms: {
-        noun: "serendipity",
-        adjective: "serendipitous",
-        adverb: "serendipitously",
-      },
-      examples: [
-        "Meeting my best friend was pure serendipity",
-        "The serendipity of scientific discoveries",
-        "By serendipity, she found her dream job while on vacation",
-      ],
-      synonyms: ["chance", "fortune", "luck", "destiny", "fate"],
-      antonyms: ["misfortune", "design", "plan", "intention"],
-      collocations: [
-        "pure serendipity",
-        "happy serendipity",
-        "serendipity effect",
-      ],
+    examples: [
+      "The ephemeral nature of social media trends",
+      "An ephemeral display of northern lights",
+      "Their fame proved to be ephemeral",
+    ],
+    synonyms: ["fleeting", "transient", "momentary", "brief", "temporary"],
+    antonyms: ["permanent", "lasting", "eternal", "enduring"],
+    collocations: [
+      "ephemeral beauty",
+      "ephemeral existence",
+      "ephemeral moment",
+    ],
+  },
+  {
+    id: "2",
+    word: "serendipity",
+    phonetic: "/ˌserənˈdɪpɪti/",
+    definition: "The occurrence of finding pleasant things by chance",
+    translation: "เหตุบังเอิญที่ดี",
+    timestamp: new Date("2024-02-14T11:30:00").getTime(),
+    status: "learning",
+    forms: {
+      noun: "serendipity",
+      adjective: "serendipitous",
+      adverb: "serendipitously",
     },
-  ],
-  "2024-02-13": [
-    {
-      id: "3",
-      word: "ubiquitous",
-      phonetic: "/juːˈbɪkwɪtəs/",
-      definition: "Present, appearing, or found everywhere",
-      translation: "มีอยู่ทุกหนทุกแห่ง",
-      timestamp: new Date("2024-02-13T14:45:00").getTime(),
-      status: "mastered",
-      forms: {
-        noun: "ubiquity",
-        adjective: "ubiquitous",
-        adverb: "ubiquitously",
-      },
-      examples: [
-        "Smartphones have become ubiquitous in modern life",
-        "The ubiquitous influence of social media",
-        "Coffee shops are ubiquitous in this city",
-      ],
-      synonyms: ["omnipresent", "everywhere", "pervasive", "universal"],
-      antonyms: ["rare", "scarce", "uncommon", "limited"],
-      collocations: [
-        "ubiquitous presence",
-        "ubiquitous feature",
-        "become ubiquitous",
-      ],
+    examples: [
+      "Meeting my best friend was pure serendipity",
+      "The serendipity of scientific discoveries",
+      "By serendipity, she found her dream job while on vacation",
+    ],
+    synonyms: ["chance", "fortune", "luck", "destiny", "fate"],
+    antonyms: ["misfortune", "design", "plan", "intention"],
+    collocations: [
+      "pure serendipity",
+      "happy serendipity",
+      "serendipity effect",
+    ],
+  },
+  {
+    id: "3",
+    word: "ubiquitous",
+    phonetic: "/juːˈbɪkwɪtəs/",
+    definition: "Present, appearing, or found everywhere",
+    translation: "มีอยู่ทุกหนทุกแห่ง",
+    timestamp: new Date("2024-02-13T14:45:00").getTime(),
+    status: "mastered",
+    forms: {
+      noun: "ubiquity",
+      adjective: "ubiquitous",
+      adverb: "ubiquitously",
     },
-  ],
-};
+    examples: [
+      "Smartphones have become ubiquitous in modern life",
+      "The ubiquitous influence of social media",
+      "Coffee shops are ubiquitous in this city",
+    ],
+    synonyms: ["omnipresent", "everywhere", "pervasive", "universal"],
+    antonyms: ["rare", "scarce", "uncommon", "limited"],
+    collocations: [
+      "ubiquitous presence",
+      "ubiquitous feature",
+      "become ubiquitous",
+    ],
+  },
+];
 
 interface VocabEntry {
   id: string;
@@ -112,16 +108,10 @@ interface VocabEntry {
 
 export function HistoryView() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [vocabularyData, setVocabularyData] =
-    useState<Record<string, VocabEntry[]>>(MOCK_DATA);
-
-  // Convert vocabularyData into a flat array of entries
-  const allEntries = Object.entries(vocabularyData).flatMap(
-    ([date, entries]) => entries
-  );
+  const [vocabularyData, setVocabularyData] = useState<VocabEntry[]>(MOCK_DATA);
 
   // Filter entries based on search query
-  const filteredEntries = allEntries.filter((entry) => {
+  const filteredEntries = vocabularyData.filter((entry) => {
     const searchLower = searchQuery.toLowerCase();
     return (
       entry.word.toLowerCase().includes(searchLower) ||
@@ -144,19 +134,9 @@ export function HistoryView() {
   );
 
   const handleDelete = (id: string) => {
-    setVocabularyData((prevData) => {
-      const newData = { ...prevData };
-      // Loop through each date
-      for (const date in newData) {
-        // Filter out the entry with the matching id
-        newData[date] = newData[date].filter((entry) => entry.id !== id);
-        // Remove the date key if there are no entries left
-        if (newData[date].length === 0) {
-          delete newData[date];
-        }
-      }
-      return newData;
-    });
+    setVocabularyData((prevData) =>
+      prevData.filter((entry) => entry.id !== id)
+    );
   };
 
   const handleEdit = (id: string) => {

@@ -133,25 +133,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-async function searchWord(word: string) {
-  try {
-    const response = await fetch("/api/vocabulary", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ word }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error searching word:", error);
-    throw error;
-  }
-}
