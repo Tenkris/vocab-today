@@ -5,7 +5,7 @@ import { MoonIcon, SunIcon, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -18,10 +18,9 @@ export function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const supabase = createClient();
-
     // Check current user
     const getUser = async () => {
       const {
@@ -34,8 +33,9 @@ export function Header() {
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
     await supabase.auth.signOut();
+    // redirect to home
+    redirect("/");
   };
 
   const routes = [
